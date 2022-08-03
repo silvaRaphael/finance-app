@@ -11,17 +11,17 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({Key? key}) : super(key: key);
+class ExitsPage extends StatefulWidget {
+  const ExitsPage({Key? key}) : super(key: key);
 
   @override
-  State<CalendarPage> createState() => _CalendarPageState();
+  State<ExitsPage> createState() => _ExitsPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
+class _ExitsPageState extends State<ExitsPage> {
   final box = Hive.box('bills');
-  final boxName = 0;
-  final entry = true;
+  final boxName = 'exits_user_1';
+  final entry = false;
 
   final TextEditingController _billNameController = TextEditingController();
   final TextEditingController _billValueController = TextEditingController();
@@ -38,6 +38,7 @@ class _CalendarPageState extends State<CalendarPage> {
         'date': element.date,
         'value': element.value,
         'type': element.type,
+        'entry': element.entry,
       });
     }
 
@@ -45,7 +46,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void getMonthBills(DateTime date) {
-    var result = box.get(0);
+    var result = box.get(boxName);
 
     if (result != null) {
       setState(() {
@@ -59,7 +60,7 @@ class _CalendarPageState extends State<CalendarPage> {
             date: element['date'],
             value: element['value'],
             type: element['type'],
-            entry: entry,
+            entry: element['entry'],
           ));
           if (element['date'].month == date.month) {
             billsOfMonth.add(BillsModel(
@@ -67,7 +68,7 @@ class _CalendarPageState extends State<CalendarPage> {
               date: element['date'],
               value: element['value'],
               type: element['type'],
-              entry: entry,
+              entry: element['entry'],
             ));
             totalOfMonth += element['value'];
           }
@@ -224,7 +225,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
-                      itemCount: billsTypes.length,
+                      itemCount: billsTypes.length <= 5 ? billsTypes.length : 5,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
                         return Padding(
@@ -361,7 +362,7 @@ class _CalendarPageState extends State<CalendarPage> {
           ));
         }
 
-        billType = 999;
+        billType = 0;
       });
       updateDatabase(date);
 
@@ -420,15 +421,25 @@ class _CalendarPageState extends State<CalendarPage> {
                     fontSize: 18,
                   ),
                 ),
-                Text(
-                  NumberFormat.currency(
-                    locale: 'pt_BR',
-                    name: 'R\$',
-                  ).format(totalOfMonth),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18,
-                  ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.arrow_downward,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      NumberFormat.currency(
+                        locale: 'pt_BR',
+                        name: 'R\$',
+                      ).format(totalOfMonth),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

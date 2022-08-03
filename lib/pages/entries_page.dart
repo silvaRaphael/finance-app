@@ -11,17 +11,18 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({Key? key}) : super(key: key);
+class EntriesPage extends StatefulWidget {
+  const EntriesPage({Key? key}) : super(key: key);
 
   @override
-  State<CalendarPage> createState() => _CalendarPageState();
+  State<EntriesPage> createState() => _EntriesPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
+class _EntriesPageState extends State<EntriesPage> {
   final box = Hive.box('bills');
-  final boxName = 0;
+  final boxName = 'entries_user_1';
   final entry = true;
+  final int billType = 5;
 
   final TextEditingController _billNameController = TextEditingController();
   final TextEditingController _billValueController = TextEditingController();
@@ -38,6 +39,7 @@ class _CalendarPageState extends State<CalendarPage> {
         'date': element.date,
         'value': element.value,
         'type': element.type,
+        'entry': element.entry,
       });
     }
 
@@ -45,7 +47,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void getMonthBills(DateTime date) {
-    var result = box.get(0);
+    var result = box.get(boxName);
 
     if (result != null) {
       setState(() {
@@ -59,7 +61,7 @@ class _CalendarPageState extends State<CalendarPage> {
             date: element['date'],
             value: element['value'],
             type: element['type'],
-            entry: entry,
+            entry: element['entry'],
           ));
           if (element['date'].month == date.month) {
             billsOfMonth.add(BillsModel(
@@ -67,7 +69,7 @@ class _CalendarPageState extends State<CalendarPage> {
               date: element['date'],
               value: element['value'],
               type: element['type'],
-              entry: entry,
+              entry: element['entry'],
             ));
             totalOfMonth += element['value'];
           }
@@ -80,7 +82,6 @@ class _CalendarPageState extends State<CalendarPage> {
   void openBillOptionAlert(DateTime date) {
     bool fixedBill = false;
     double billsFixedMonths = 12;
-    int billType = 0;
 
     showModalBottomSheet(
       isScrollControlled: true,
@@ -218,48 +219,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
                   const SizedBox(height: 12),
 
-                  // bill type options
-                  SizedBox(
-                    height: 50,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemCount: billsTypes.length,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                billType = index;
-                              });
-                            },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                color: billType == index
-                                    ? billsTypesColors[index]
-                                    : billsTypesColors[index].withOpacity(.5),
-                                width: 50,
-                                height: 50,
-                                child: Center(
-                                  child: Icon(
-                                    billsTypes[index],
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
                   // add button
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -360,8 +319,6 @@ class _CalendarPageState extends State<CalendarPage> {
             entry: entry,
           ));
         }
-
-        billType = 999;
       });
       updateDatabase(date);
 
@@ -420,15 +377,25 @@ class _CalendarPageState extends State<CalendarPage> {
                     fontSize: 18,
                   ),
                 ),
-                Text(
-                  NumberFormat.currency(
-                    locale: 'pt_BR',
-                    name: 'R\$',
-                  ).format(totalOfMonth),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18,
-                  ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.arrow_upward,
+                      color: Colors.green,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      NumberFormat.currency(
+                        locale: 'pt_BR',
+                        name: 'R\$',
+                      ).format(totalOfMonth),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

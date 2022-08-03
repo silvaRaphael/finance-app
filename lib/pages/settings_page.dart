@@ -11,8 +11,8 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final box = Hive.box('bills');
 
-  void resetBills() {
-    box.put(0, null);
+  void resetBills(bill) {
+    box.put(bill, null);
   }
 
   @override
@@ -23,8 +23,16 @@ class _SettingsPageState extends State<SettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextButton(
-              onPressed: resetBills,
-              child: const Text('Limpar contas'),
+              onPressed: () {
+                resetBills('entries_user_1');
+              },
+              child: const Text('Limpar entradas'),
+            ),
+            TextButton(
+              onPressed: () {
+                resetBills('exits_user_1');
+              },
+              child: const Text('Limpar saídas'),
             ),
           ],
         ),
