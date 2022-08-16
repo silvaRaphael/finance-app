@@ -86,10 +86,12 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          BillChart(
-            exitsBillsOfMonthChartData: exitsBillsOfMonthChartData,
-            exitsTotalOfMonth: exitsTotalOfMonth,
-          ),
+          exitsBillsOfMonthChartData.isNotEmpty
+              ? BillChart(
+                  exitsBillsOfMonthChartData: exitsBillsOfMonthChartData,
+                  exitsTotalOfMonth: exitsTotalOfMonth,
+                )
+              : const SizedBox(height: 20),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -154,6 +156,52 @@ class _DashboardPageState extends State<DashboardPage> {
                         locale: 'pt_BR',
                         name: 'R\$',
                       ).format(entriesTotalOfMonth),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // end value
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Saldo',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                  ),
+                ),
+                Row(
+                  children: [
+                    entriesTotalOfMonth > exitsTotalOfMonth
+                        ? const Icon(
+                            Icons.add,
+                            color: Colors.green,
+                            size: 20,
+                          )
+                        : entriesTotalOfMonth < exitsTotalOfMonth
+                            ? const Icon(
+                                Icons.remove,
+                                color: Colors.red,
+                                size: 20,
+                              )
+                            : const SizedBox(),
+                    const SizedBox(width: 4),
+                    Text(
+                      NumberFormat.currency(
+                        locale: 'pt_BR',
+                        name: 'R\$',
+                      ).format((entriesTotalOfMonth - exitsTotalOfMonth).abs()),
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 18,
